@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../../core/tsSupport/extendsHelper","../../../../core/libs/gl-matrix-2/vec3","../../../../core/libs/gl-matrix-2/vec3f64","../../support/buffer/InterleavedLayout","../lib/GLMaterial","../lib/Material","../lib/Util","./internal/MaterialUtil","./renderers/MergedRenderer","../shaders/MeasurementArrowPrograms","../../../webgl/renderState"],function(t,e,r,o,n,i,a,s,p,c,f,u,l){var m=function(t){function e(e,r){var o=t.call(this,r)||this;return o.params=c.copyParameters(e,d),o}return r(e,t),e.prototype.dispose=function(){},e.prototype.setParameterValues=function(t){c.updateParameters(this.params,t)&&this.notifyDirty("matChanged")},e.prototype.getParameters=function(){return this.params},e.prototype.intersect=function(t,e,r,o,n,i,a,s){},e.prototype.createBufferWriter=function(){return new w},e.prototype.createRenderer=function(t,e){return new f(t,e,this)},e.prototype.getGLMaterials=function(){return{color:v,depthShadowMap:void 0,normal:void 0,depth:void 0,highlight:void 0}},e.prototype.getAllTextureIds=function(){return[]},e}(s),v=function(t){function e(e,r,o){var n=t.call(this,e,r)||this;return n.updateParameters(),n}return r(e,t),e.prototype.selectProgram=function(){this.program=this.programRep.getProgram(u.colorPass),this.pipelineState=l.makePipelineState({polygonOffset:this.params.polygonOffset&&{factor:0,units:-4},depthTest:{func:513},depthWrite:l.defaultDepthWriteParams,colorWrite:l.defaultColorWriteParams})},e.prototype.updateParameters=function(){this.params=c.copyParameters(this.material.getParameters()),this.selectProgram()},e.prototype.beginSlot=function(t){return 4===t},e.prototype.getProgram=function(){return this.program},e.prototype.getDrawMode=function(){return 5},e.prototype.bind=function(t,e){var r=this.program;t.bindProgram(r),t.setPipelineState(this.pipelineState),r.setUniform1f("width",this.params.width),r.setUniform1f("outlineSize",this.params.outlineSize),r.setUniform4fv("outlineColor",this.params.outlineColor),r.setUniform1f("stripeLength",this.params.stripeLength),r.setUniform4fv("stripeEvenColor",this.params.stripeEvenColor),r.setUniform4fv("stripeOddColor",this.params.stripeOddColor)},e.prototype.bindView=function(t,e){var r=e.origin,o=this.getProgram();c.bindView(r,e.view,o)},e.prototype.bindInstance=function(t,e){this.getProgram().setUniformMatrix4fv("model",e.transformation)},e.prototype.release=function(t){},e}(a),d={width:32,outlineSize:.2,outlineColor:[1,.5,0,1],stripeLength:1,stripeEvenColor:[1,1,1,1],stripeOddColor:[1,.5,0,1],polygonOffset:!1},h=i.newLayout().vec3f(p.VertexAttrConstants.POSITION).vec3f(p.VertexAttrConstants.NORMAL).vec2f(p.VertexAttrConstants.UV0).f32(p.VertexAttrConstants.AUXPOS1),g=n.vec3f64.create(),y=n.vec3f64.create(),P=n.vec3f64.create(),C=n.vec3f64.create(),x=n.vec3f64.create(),w=function(){function t(){this.vertexBufferLayout=h}return t.prototype.allocate=function(t){return this.vertexBufferLayout.createBuffer(t)},t.prototype.elementCount=function(t){return 2*(t.indices[p.VertexAttrConstants.POSITION].length/2+1)},t.prototype.write=function(t,e,r,n,i){var a=e.vertexAttr[p.VertexAttrConstants.POSITION].data,s=e.vertexAttr[p.VertexAttrConstants.NORMAL].data,c=a.length/3,f=e&&e.indices&&e.indices.position;f&&f.length!==2*(c-1)&&console.warn("MeasurementArrowMaterial does not support indices");for(var u=g,l=y,m=P,v=C,d=x,h=t.transformation,w=t.invTranspTransformation,M=n.position,A=n.normal,O=n.uv0,S=0,V=0;V<c;++V){var b=3*V;if(o.vec3.set(u,a[b],a[b+1],a[b+2]),V<c-1){var L=3*(V+1);o.vec3.set(l,a[L],a[L+1],a[L+2]),o.vec3.set(d,s[L],s[L+1],s[L+2]),o.vec3.normalize(d,d),o.vec3.subtract(m,l,u),o.vec3.normalize(m,m),o.vec3.cross(v,d,m),o.vec3.normalize(v,v)}var U=o.vec3.distance(u,l);h&&w&&(o.vec3.transformMat4(u,u,h),o.vec3.transformMat4(l,l,h),o.vec3.transformMat4(v,v,w));var I=i+2*V,T=I+1;M.setVec(I,u),M.setVec(T,u),A.setVec(I,v),A.setVec(T,v),O.set(I,0,S),O.set(I,1,-1),O.set(T,0,S),O.set(T,1,1),V<c-1&&(S+=U)}for(var z=n.auxpos1,V=0;V<2*c;++V)z.set(i+V,S)},t}();return m});

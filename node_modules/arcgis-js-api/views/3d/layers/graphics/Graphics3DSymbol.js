@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../../core/tsSupport/extendsHelper","./Graphics3DGraphic","./Graphics3DObject3DGraphicLayer","./Graphics3DSymbolLayerFactory","./symbolComplexity","../../support/PromiseLightweight"],function(r,e,t,i,s,o,a,l){return function(r){function e(e,t,i){var s=r.call(this)||this;s._symbol=e,s.referenced=0;var a=e.symbolLayers;i&&(a=i.concat(a));var l=a.length;s.childGraphics3DSymbols=new Array(a.length),s.childGraphics3DSymbolPromises=new Array(a.length);for(var c=t.layerOrder,h=0,n=0,p=function(r,e){e&&(s.childGraphics3DSymbols[r]=e,n++),h--,!s.isRejected()&&h<1&&(n>0?s.resolve():s.reject())},y=0;y<l;y++){var f=a.getItemAt(y);if(!1!==f.enabled){t.layerOrder=c+(1-(1+y)/l),t.layerOrderDelta=1/l;var u=o.make(s.symbol,f,t,f._ignoreDrivers);u&&(h++,s.childGraphics3DSymbolPromises[y]=u)}}if(t.layerOrder=c,0===h)s.resolve();else for(var d=this,y=0;y<l;y++)!function(r){var e=d.childGraphics3DSymbolPromises[r];e&&e.then(function(){return p(r,e)},function(){return p(r,null)})}(y);return s}return t(e,r),e.prototype.getSymbolLayerSize=function(r,e){var t=this;this.then(function(){var i=t.childGraphics3DSymbols[r];e(i?i.getCachedSize():null)},function(){return e(null)})},Object.defineProperty(e.prototype,"symbol",{get:function(){return this._symbol},set:function(r){if(this._symbol=r,this.childGraphics3DSymbols)for(var e=0;e<r.symbolLayers.length;e++){var t=this.childGraphics3DSymbols[e];t&&(t.symbol=r,t.symbolLayer=r.symbolLayers.items[e])}},enumerable:!0,configurable:!0}),e.prototype.createGraphics3DGraphic=function(r,e){for(var t=r.graphic,s=new Array(this.childGraphics3DSymbols.length),o=0;o<this.childGraphics3DSymbols.length;o++){var a=this.childGraphics3DSymbols[o];a&&(s[o]=a.createGraphics3DGraphic(r))}return new i(t,e||this,s,r.layer)},Object.defineProperty(e.prototype,"complexity",{get:function(){return a.totalSymbolComplexities(this.childGraphics3DSymbols.map(function(r){return r&&r.complexity}))},enumerable:!0,configurable:!0}),e.prototype.globalPropertyChanged=function(r,e){for(var t=this.childGraphics3DSymbols.length,i=this,o=0;o<t;o++){var a=function(t){var o=i.childGraphics3DSymbols[t],a=function(r){var e=r._graphics[t];return e instanceof s?e:null};if(o&&!o.globalPropertyChanged(r,e,a))return{value:!1}}(o);if("object"==typeof a)return a.value}return!0},e.prototype.applyRendererDiff=function(r,e){return!!this.isResolved()&&this.childGraphics3DSymbols.reduce(function(t,i,s){return t&&(!i||i.applyRendererDiff(r,e))},!0)},e.prototype.prepareSymbolPatch=function(r){if(!this.isRejected()&&"partial"===r.diff.type){var e=r.diff.diff;if(e.symbolLayers&&"partial"===e.symbolLayers.type){var t=e.symbolLayers.diff;(this.isResolved()?this.childGraphics3DSymbols:this.childGraphics3DSymbolPromises).forEach(function(e,i){var s;if(e){var o=t[i];if(o){var a={diff:o,graphics3DGraphicPatches:[],symbolLayerStatePatches:[]};e.prepareSymbolLayerPatch(a),(s=r.symbolStatePatches).push.apply(s,a.symbolLayerStatePatches),a.graphics3DGraphicPatches.length&&r.graphics3DGraphicPatches.push(function(r,e){var t=r._graphics[i];a.graphics3DGraphicPatches.forEach(function(r){return r(t,e)})})}}})}}},e.prototype.updateGeometry=function(r,e){for(var t=0;t<this.childGraphics3DSymbols.length;t++){var i=this.childGraphics3DSymbols[t];if(i&&!i.updateGeometry(r._graphics[t],e))return!1}return!0},e.prototype.getFastUpdateStatus=function(){var r=0,e=0,t=0;return this.childGraphics3DSymbolPromises.forEach(function(i){i&&!i.isFulfilled()?r++:i&&i.isFastUpdatesEnabled()?t++:i&&e++}),{loading:r,slow:e,fast:t}},e.prototype.setDrawOrder=function(r,e){for(var t=this.childGraphics3DSymbols.length,i=1/t,s=0;s<t;s++){var o=this.childGraphics3DSymbols[s];if(o){var a=r+(1-(1+s)/t);o.setDrawOrder(a,i,e)}}},e.prototype.destroy=function(){if(this.destroyed)return void console.error("Graphics3DSymbol.destroy called when already destroyed!");this.isFulfilled()||this.reject();for(var r=0;r<this.childGraphics3DSymbolPromises.length;r++)this.childGraphics3DSymbolPromises[r]&&this.childGraphics3DSymbolPromises[r].destroy();this.childGraphics3DSymbolPromises=null,this.childGraphics3DSymbols=null},Object.defineProperty(e.prototype,"destroyed",{get:function(){return null==this.childGraphics3DSymbols},enumerable:!0,configurable:!0}),e}(l.default)});

@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../core/tsSupport/awaiterHelper","../../../core/tsSupport/generatorHelper","../../../core/tsSupport/assignHelper","../../../core/maybe","../../../core/promiseUtils","../../../core/libs/gl-matrix-2/mat4f64","./DefaultErrorContext","./LoaderResult","./internal/Resource"],function(e,t,r,n,a,s,o,l,i,u,c){function d(e,t,a){return void 0===a&&(a={}),r(this,void 0,void 0,function(){var a,o,i,u,d=this;return n(this,function(f){switch(f.label){case 0:return[4,c.Resource.load(e,v,t)];case 1:return a=f.sent(),o="gltf_"+b++,i={lods:[],materials:new Map,textures:new Map},u=!(!a.json.asset.extras||"symbolResource"!==a.json.asset.extras.ESRI_type),[4,m(a,function(e,t,u,c){return r(d,void 0,void 0,function(){var r,d,m,f,x,b,g,S,_,M;return n(this,function(n){switch(n.label){case 0:return r=e.mode||4,d=p(r),s.isNone(d)?(v.warnUnsupported("Unsupported primitive mode ("+T[r]+"). Skipping primitive."),[2]):[4,a.getMaterial(e)];case 1:return m=n.sent(),x={transform:l.mat4f64.clone(t)},b={},[4,a.getPositionData(e)];case 2:return x.attributes=(b.position=n.sent(),b.normal=null,b.texCoord0=null,b.color=null,b.tangent=null,b),[4,a.getIndexData(e)];case 3:return x.indices=n.sent(),(x.primitiveType=d,x.material=h(i,m,o),f=x,a.hasNormals(e))?(g=f.attributes,[4,a.getNormalData(e)]):[3,5];case 4:g.normal=n.sent(),n.label=5;case 5:return a.hasTangents(e)?(S=f.attributes,[4,a.getTangentData(e)]):[3,7];case 6:S.tangent=n.sent(),n.label=7;case 7:return a.hasTextureCoordinates(e)?(_=f.attributes,[4,a.getTextureCoordinates(e)]):[3,9];case 8:_.texCoord0=n.sent(),n.label=9;case 9:return a.hasVertexColors(e)?(M=f.attributes,[4,a.getVertexColors(e)]):[3,11];case 10:M.color=n.sent(),n.label=11;case 11:return i.lods[u]=i.lods[u]||{parts:[],name:c,lodThreshold:null},i.lods[u].parts.push(f),[2]}})})})];case 2:return f.sent(),[2,{model:i,meta:{isEsriSymbolResource:u,uri:a.uri},customMeta:{}}]}})})}function p(e){switch(e){case 4:case 5:case 6:return e;default:return null}}function m(e,t){return r(this,void 0,void 0,function(){function a(o,l){return r(this,void 0,void 0,function(){var r,i,u,c,d,p,m,f,h;return n(this,function(n){switch(n.label){case 0:if(r=s.nodes[o],i=e.getNodeTransform(o),v.warnUnsupportedIf(null!=r.weights,"Morph targets are not supported."),null==r.mesh)return[3,4];u=s.meshes[r.mesh],c=0,d=u.primitives,n.label=1;case 1:return c<d.length?(p=d[c],[4,t(p,i,l,u.name)]):[3,4];case 2:n.sent(),n.label=3;case 3:return c++,[3,1];case 4:m=0,f=r.children||[],n.label=5;case 5:return m<f.length?(h=f[m],[4,a(h,l)]):[3,8];case 6:n.sent(),n.label=7;case 7:return m++,[3,5];case 8:return[2]}})})}var s,l,i,u,c,d,p,m,h,x;return n(this,function(t){switch(t.label){case 0:s=e.json,l=s.scenes[s.scene||0],i=l.nodes,u=i.length>1,c=0,d=i,t.label=1;case 1:return c<d.length?(p=d[c],m=s.nodes[p],h=[a(p,0)],f(m)&&!u&&(x=m.extensions.MSFT_lod.ids,h.push.apply(h,x.map(function(e,t){return a(e,t+1)}))),[4,o.all(h)]):[3,4];case 2:t.sent(),t.label=3;case 3:return c++,[3,1];case 4:return[2]}})})}function f(e){return e.extensions&&e.extensions.MSFT_lod&&Array.isArray(e.extensions.MSFT_lod.ids)}function h(e,t,r){var n=function(t){var n=r+"_tex_"+(t&&t.id)+(t&&t.name?"_"+t.name:"");if(t&&!e.textures.has(n)){var a=u.makeTextureSource(t.data,{wrap:{s:x(t.wrapS),t:x(t.wrapT)},mipmap:g.some(function(e){return e===t.minFilter}),noUnpackFlip:!0});e.textures.set(n,a)}return n},a=r+"_mat_"+t.id+"_"+t.name;if(!e.materials.has(a)){var s=u.makeMaterialParameters({color:[t.color[0],t.color[1],t.color[2]],opacity:t.color[3],alphaMode:t.alphaMode,alphaCutoff:t.alphaCutoff,doubleSided:t.doubleSided,colorMixMode:t.ESRI_externalColorMixMode,textureColor:t.colorTexture?n(t.colorTexture):void 0,textureNormal:t.normalTexture?n(t.normalTexture):void 0});e.materials.set(a,s)}return a}function x(e){if(33071===e||33648===e||10497===e)return e;v.error("Unexpected TextureSampler WrapMode: "+e)}Object.defineProperty(t,"__esModule",{value:!0});var b=0;t.load=d;var v=new i.DefaultErrorContext,g=[9987,9985],T=["POINTS","LINES","LINE_LOOP","LINE_STRIP","TRIANGLES","TRIANGLE_STRIP","TRIANGLE_FAN"]});

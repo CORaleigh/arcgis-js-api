@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../core/promiseUtils","../../../core/libs/gl-matrix-2/mat4","../../../core/libs/gl-matrix-2/mat4f64","../../../core/libs/gl-matrix-2/quat","../../../core/libs/gl-matrix-2/quatf32","../../../core/libs/gl-matrix-2/vec3","../../../core/libs/gl-matrix-2/vec3f64","../../../geometry/SpatialReference","../../../geometry/support/meshUtils/deduplicate","./i3s/I3SGeometryUtil","./i3s/I3SProjectionUtil","../support/orientedBoundingBox","../support/projectionUtils","../webgl-engine/lib/PreinterleavedGeometryData","../webgl-engine/lib/Util"],function(e,t,r,a,o,n,s,i,f,c,l,u,m,d,p,v,b){var h=function(){function e(){}return e.prototype.process=function(e){var t=[e.geometryBuffer],a=this.transform(e,t);return r.resolve({result:a,transferList:t})},e.prototype.transform=function(e,t){var r=c.fromJSON(e.indexSR),o=c.fromJSON(e.vertexSR),n=c.fromJSON(e.renderSR),s=e.geometryBuffer,f=m.computeGlobalTransformation(e.mbs,e.elevationOffset,r,n);a.mat4.invert(x,f);var h=e.obb?null:d.create([0,0,0],[-1,-1,-1],[0,0,0,1]);i.vec3.copy(O,e.mbs),O[2]+=e.elevationOffset,i.vec3.copy(g,O);for(var C=!1,S=0,y=[],A=0,M=e.geometryData;A<M.length;A++)for(var I=M[A],N=I.geometries,R=I.componentOffsets,V=0,D=N;V<D.length;V++){var P=D[V],q=e.layouts[S];++S;var E=[{name:b.VertexAttrConstants.COLOR,byteValue:255}],L=[b.VertexAttrConstants.NORMAL,b.VertexAttrConstants.NORMALCOMPRESSED,b.VertexAttrConstants.SYMBOLCOLOR,b.VertexAttrConstants.COMPONENTINDEX],z=u.interleaveGeometryBuffer(P,s,q,E,L),B=new v(new Float32Array(z),q),T=B.getAttribute(b.VertexAttrConstants.POSITION),U=e.mbs,_=e.elevationOffset;if(m.reprojectPoints(T,U,x,_,r,o,n),h&&this._updateObb(h,T,f),e.needNormals){var w={normals:B.getAttribute(b.VertexAttrConstants.NORMALCOMPRESSED),positions:T,normalInd:B.getIndices(b.VertexAttrConstants.NORMALCOMPRESSED),positionInd:B.getIndices(b.VertexAttrConstants.POSITION)},G=e.normalReferenceFrame;u.processAndInterleaveNormals(G,P,s,f,w)}var j=B.getAttribute(b.VertexAttrConstants.COMPONENTINDEX);j&&this._createComponentNumbers(j,R);var J=B.getAttribute(b.VertexAttrConstants.COLOR);J&&!C&&(C=this._hasColors(J));var F={globalTrafo:f},X=q[0].stride,Y=1-.8*X/(X+4),k=l.default(z,X/4,null,Y);if(null!=k){var H=k.uniqueCount<65536?new Uint16Array(k.indices):k.indices,K=u.extractPositionData(k.buffer,q,H);y.push({layout:q,interleavedVertexData:k.buffer,indices:H,corMatrices:F,hasColors:C,positionData:K}),t&&(t.push(k.buffer),t.push(H.buffer),t.push(K.data.buffer),t.push(K.indices.buffer))}else{var K=u.extractPositionData(z,q);y.push({layout:q,interleavedVertexData:z,corMatrices:F,hasColors:C,positionData:K}),t&&(t.push(z),t.push(K.data.buffer),t.push(K.indices.buffer))}}return h&&(i.vec3.transformMat4(h.center,h.center,f),p.vectorToVector(h.center,n,h.center,r),h.center[2]-=e.elevationOffset),{geometryBuffer:s,transformedGeometries:y,obb:h}},e.prototype._hasColors=function(e){for(var t=e.data,r=e.size,a=e.offsetIdx,o=e.strideIdx,n=a;n<t.length;n+=o)for(var s=0;s<r;s++)if(255!==t[n+s])return!0;return!1},e.prototype._createComponentNumbers=function(e,t){for(var r=e.data,a=e.offsetIdx,o=e.strideIdx,n=r.length/o,s=0,i=a,f=0;f<n;f++)f>=t[s+1]&&s++,r[i]=s,i+=o},e.prototype._updateObb=function(e,t,r){if(e.halfSize[0]>0){i.vec3.subtract(O,e.center,e.halfSize),i.vec3.add(g,e.center,e.halfSize);for(var a=t.offsetIdx;a<t.data.length;a+=t.strideIdx)O[0]=Math.min(O[0],t.data[a]),O[1]=Math.min(O[1],t.data[a+1]),O[2]=Math.min(O[2],t.data[a+2]),g[0]=Math.max(g[0],t.data[a]),g[1]=Math.max(g[1],t.data[a+1]),g[2]=Math.max(g[2],t.data[a+2]);i.vec3.subtract(e.halfSize,g,O),i.vec3.scale(e.halfSize,e.halfSize,.5),i.vec3.add(e.center,O,g),i.vec3.scale(e.center,e.center,.5)}else{d.compute(t,e);var o=2*Math.sqrt(1+r[0]+r[5]+r[10]);C[0]=(r[9]-r[6])/o,C[1]=(r[2]-r[8])/o,C[2]=(r[4]-r[1])/o,C[3]=.25*o,n.quat.conjugate(C,C),n.quat.multiply(e.quaternion,C,e.quaternion)}},e}(),x=o.mat4f64.create(),O=f.vec3f64.create(),g=f.vec3f64.create(),C=s.quatf32.create();return h});

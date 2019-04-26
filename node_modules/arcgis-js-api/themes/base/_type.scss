@@ -1,0 +1,19 @@
+// Font
+$font-family: "Avenir Next W00", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+
+// Text
+$line-height: 1.3em !default;
+$base-font-size: 14px !default;
+$font-size: $base-font-size !default;
+
+$font-size__h1: round($base-font-size * 1.428) !default; //1.428em
+$font-size__h2: round($base-font-size * 1.142) !default; //1.142em
+$font-size__lt-h2: $base-font-size !default;
+$font-size__body: round($base-font-size * 0.857) !default; //0.857em
+$font-size--small: round($base-font-size * 0.857) !default;
+
+$font-size__header-text: round($base-font-size * 1.143) !default; //1.142em
+
+$font-weight: 400 !default;
+$font-weight__heading: 600 !default;
+$font-weight__bold: 600 !default;

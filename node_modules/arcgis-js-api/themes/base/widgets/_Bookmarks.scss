@@ -1,0 +1,117 @@
+@mixin bookmarks() {
+  $bookmarks-height--loading: 150px !default;
+  .esri-bookmarks {
+    background-color: $background-color;
+  }
+
+  .esri-bookmarks.esri-disabled {
+    color: $interactive-font-color--disabled;
+  }
+
+  .esri-bookmarks__loader-container {
+    height: $bookmarks-height--loading;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .esri-bookmarks__loader {
+    height: 64px;
+    width: 100%;
+    background: url(../base/images/loading-throb.gif) no-repeat center center;
+  }
+
+  .esri-bookmarks__list {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .esri-bookmarks__bookmark {
+    padding: $cap-spacing--half $side-spacing--half;
+    border-top: 1px solid $border-color;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    transition: background-color 250ms ease-in-out;
+
+    &:hover {
+      background-color: $background-color--hover;
+    }
+
+    &:first-child {
+      border-top: none;
+    }
+  }
+
+  @include loopingProgressBar(".esri-bookmarks__bookmark--active");
+
+  .esri-bookmarks__bookmark--active {
+    color: $font-color;
+    background-color: $background-color--active;
+    cursor: default;
+    &:hover,
+    &:focus {
+      color: $font-color;
+      background-color: $background-color--active;
+      cursor: default;
+    }
+  }
+
+  .esri-bookmarks__bookmark-icon {
+    padding: 0 $side-spacing--half;
+  }
+
+  .esri-bookmarks__bookmark-name {
+    flex: 1;
+    overflow: hidden;
+    padding: $cap-spacing 0;
+    overflow-wrap: break-word; /* Firefox */
+    word-break: break-word;
+  }
+
+  .esri-bookmarks__bookmark-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: $button-height--double;
+    overflow: hidden;
+    margin-right: $side-spacing--half;
+    width: $button-width--double;
+  }
+
+  .esri-bookmarks__image {
+    height: $button-height--double;
+    min-width: $button-height--double;
+  }
+
+  .esri-bookmarks--fade-in {
+    opacity: 0;
+    transition: opacity 375ms ease-out;
+  }
+
+  .esri-bookmarks--fade-in-active {
+    opacity: 1;
+  }
+
+  html[dir="rtl"] .esri-bookmarks {
+    .esri-bookmarks__bookmark {
+      &--active:after {
+        animation: looping-progresss-bar-ani $looping-progress-bar-params reverse;
+      }
+    }
+    .esri-bookmarks__bookmark-container {
+      margin-right: 0;
+      margin-left: $side-spacing--half;
+    }
+  }
+}
+
+@if $include_Bookmarks==true {
+  @include bookmarks();
+}

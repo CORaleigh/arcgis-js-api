@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../../core/maybe","../../../../core/screenUtils","../../../../core/unitUtils","../../../../core/libs/gl-matrix-2/mat4f32","../../../../renderers/support/utils","./definitions","./Utils"],function(e,t,o,f,c,i,h,s,p){function S(e,t){var i=t.length;if(e<t[0].value||1===i)return t[0].size;for(var s=1;s<i;s++)if(e<t[s].value){var a=(e-t[s-1].value)/(t[s].value-t[s-1].value);return t[s-1].size+a*(t[s].size-t[s-1].size)}return t[i-1].size}function r(e,t,i){void 0===i&&(i=0);var s=t.r,a=t.g,o=t.b,r=t.a;e[i+0]=s*r/255,e[i+1]=a*r/255,e[i+2]=o*r/255,e[i+3]=r}var n=function(e,t,i){for(var s=16*i,a=s,o=0;a<Math.min(s+16,e.length);a++,o++)e[a]=t[o]},l=i.mat4f32.create(),a=i.mat4f32.fromValues(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);return function(){function e(){this.symbolLevels=[],this.vvColorValues=new Float32Array(8),this.vvColors=new Float32Array(32),this.vvOpacityValues=new Float32Array(8),this.vvOpacities=new Float32Array(8),this.vvSizeMinMaxValue=new Float32Array(4),this.vvSizeFieldStopsValues=new Float32Array(6),this.vvSizeFieldStopsSizes=new Float32Array(6),this.ddColors=new Float32Array(32),this.ddBackgroundColor=new Float32Array(4),this.insideEffect=new Float32Array(16*s.MAX_FILTERS),this.outsideEffect=new Float32Array(16*s.MAX_FILTERS),this.effectCount=0,this._vvMaterialParameters={vvSizeEnabled:!1,vvColorEnabled:!1,vvRotationEnabled:!1,vvRotationType:"geographic",vvOpacityEnabled:!1},this.symbolLevels.push(0),n(this.insideEffect,l,0),n(this.outsideEffect,a,0);for(var e=1;e<s.MAX_FILTERS;e++)n(this.insideEffect,l,e),n(this.outsideEffect,l,e)}return Object.defineProperty(e.prototype,"vvMaterialParameters",{get:function(){return this._vvMaterialParameters},enumerable:!0,configurable:!0}),e.prototype.update=function(e,t,i,s){var a=this;switch(o.isSome(s)?(s.forEach(function(e,t){return a._updateEffects(t,e)}),this.effectCount=s.length):this.effectCount=0,i&&this._updateVisualVariables(i,e),t.type){case"dot-density":this._updateDotDensityInfo(t.attributes),this.ddDotValue=t.referenceDotValue,this.ddDotScale=t.referenceScale,this.ddDotSize=t.dotSize,this.ddDotBlending=t.blendDots,this.ddSeed=t.seed,r(this.ddBackgroundColor,t.backgroundColor)}},e.prototype.getVariation=function(){return{ddDotBlending:this.ddDotBlending,outsideLabelsVisible:this.outsideLabelsVisible,effectCount:this.effectCount}},e.prototype.getVariationHash=function(){return(this.ddDotBlending?1:0)|(this.outsideLabelsVisible?1:0)<<1|this.effectCount<<2},e.prototype._updateEffects=function(e,t){var i=e+1;if(o.isSome(t)&&t.filter&&t.filter.enabled){this.outsideLabelsVisible=t.excludedLabelsVisible;var s=t.parsedIncludedEffect,a=t.parsedExcludedEffect;o.isSome(s)?n(this.insideEffect,s.getColorMatrix(),i):n(this.insideEffect,l,i),o.isSome(a)?n(this.outsideEffect,a.getColorMatrix(),i):n(this.outsideEffect,l,i)}else n(this.insideEffect,l,i),n(this.outsideEffect,l,i)},e.prototype._updateVisualVariables=function(e,t){var i=this._vvMaterialParameters;if(i.vvOpacityEnabled=!1,i.vvSizeEnabled=!1,i.vvColorEnabled=!1,i.vvRotationEnabled=!1,e){var s=e.size;if(s){if(i.vvSizeEnabled=!0,s.minMaxValue){var a=s.minMaxValue,o=void 0,r=void 0;if(p.isDefined(a.minSize)&&p.isDefined(a.maxSize))if(p.isNumber(a.minSize)&&p.isNumber(a.maxSize))o=f.pt2px(a.minSize),r=f.pt2px(a.maxSize);else{var n=t.scale;o=f.pt2px(S(n,a.minSize.stops)),r=f.pt2px(S(n,a.maxSize.stops))}this.vvSizeMinMaxValue.set([a.minDataValue,a.maxDataValue,o,r])}if(s.scaleStops&&(this.vvSizeScaleStopsValue=f.pt2px(S(t.scale,s.scaleStops.stops))),s.unitValue){var l=c.getMetersPerUnitForSR(t.spatialReference)/h.meterIn[s.unitValue.unit];this.vvSizeUnitValueToPixelsRatio=l/t.resolution}s.fieldStops&&(this.vvSizeFieldStopsValues.set(s.fieldStops.values),this.vvSizeFieldStopsSizes.set(s.fieldStops.sizes))}var v=e.color;v&&(i.vvColorEnabled=!0,this.vvColorValues.set(v.values),this.vvColors.set(v.colors));var d=e.opacity;d&&(i.vvOpacityEnabled=!0,this.vvOpacityValues.set(d.values),this.vvOpacities.set(d.opacities));var u=e.rotation;u&&(i.vvRotationEnabled=!0,i.vvRotationType=u.type)}},e.prototype._updateDotDensityInfo=function(e){for(var t=this.ddColors,i=0;i<Math.min(s.DOT_DENSITY_MAX_FIELDS,e.length);i++){r(t,e[i].color,4*i)}},e}()});

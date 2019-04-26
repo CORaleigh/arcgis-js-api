@@ -1,0 +1,32 @@
+define({
+	root: {
+		popupTriggerLabel: 'Show or hide columns',
+		popupLabel: 'Show or hide columns'
+	},
+	ar:true,
+	cs:true,
+	da:true,
+	de:true,
+	es:true,
+	et:true,
+	fi:true,
+	fr:true,
+	he:true,
+	hi:true,
+	it:true,
+	ja:true,
+	ko:true,
+	lt:true,
+	lv:true,
+	nl:true,
+	nb:true,
+	pl:true,
+	"pt-br":true,
+	"pt-pt":true,
+	ro:true,
+	ru:true,
+	sv:true,
+	th:true,
+	tr:true,
+	"zh-cn":true
+});

@@ -1,0 +1,25 @@
+// COPYRIGHT © 2018 Esri
+//
+// All rights reserved under the copyright laws of the United States
+// and applicable international laws, treaties, and conventions.
+//
+// This material is licensed for use under the Esri Master License
+// Agreement (MLA), and is bound by the terms of that agreement.
+// You may redistribute and use this code without modification,
+// provided you adhere to the terms of the MLA and include this
+// copyright notice.
+//
+// See use restrictions at http://www.esri.com/legal/pdfs/mla_e204_e300/english
+//
+// For additional information, contact:
+// Environmental Systems Research Institute, Inc.
+// Attn: Contracts and Legal Services Department
+// 380 New York Street
+// Redlands, California, USA 92373
+// USA
+//
+// email: contracts@esri.com
+//
+// See http://js.arcgis.com/4.11/esri/copyright.txt for details.
+
+define(["require","exports","../../../core/libs/gl-matrix-2/mat4","../../../core/libs/gl-matrix-2/mat4f64","../../../core/libs/gl-matrix-2/vec3","../../../core/libs/gl-matrix-2/vec3f64","../lib/SunCalc","./mathUtils"],function(t,e,i,a,n,l,o,r){function s(t,i){var a=i.z,l=v;n.vec3.set(l.ambient.color,1,1,1),l.ambient.intensity=e.settings.global.ambient,n.vec3.set(l.diffuse.color,1,1,1),l.diffuse.intensity=e.settings.global.diffuse;var s=(Math.abs(a)-e.settings.local.altitude)/(e.settings.global.altitude-e.settings.local.altitude);s=r.clamp(s,0,1),l.globalFactor=s;var u=o.getTimes(t,i.y,i.x);if(s<1){var c=m(t,u);n.vec3.lerp(l.ambient.color,c.ambient.color,l.ambient.color,s),l.ambient.intensity=r.lerp(c.ambient.intensity,l.ambient.intensity,s),n.vec3.lerp(l.diffuse.color,c.diffuse.color,l.diffuse.color,s),l.diffuse.intensity=r.lerp(c.diffuse.intensity,l.diffuse.intensity,s)}return l.noonFactor=f(t,u),l}function u(t,a,s,u){u||(u=l.vec3f64.create());var c=b,f=i.mat4.identity(d);if("global"===s)o.getPosition(t,0,0,c),n.vec3.set(u,0,0,-1),i.mat4.rotateX(f,f,-c.azimuth),i.mat4.rotateY(f,f,-c.altitude),n.vec3.transformMat4(u,u,f);else{var m=e.settings.planarDirection,g=m.globalAngles,v=a.z,A=(Math.abs(v)-m.localAltitude)/(m.globalAltitude-m.localAltitude);A=r.clamp(A,0,1),A<1?(o.getPosition(t,a.y,a.x,c),c.azimuth=(1-A)*c.azimuth+A*g.azimuth,c.altitude=(1-A)*c.altitude+A*g.altitude):(c.azimuth=g.azimuth,c.altitude=g.altitude),n.vec3.set(u,0,-1,0),i.mat4.rotateZ(f,f,-c.azimuth),i.mat4.rotateX(f,f,-c.altitude),n.vec3.transformMat4(u,u,f)}return u}function c(t,i){if("global"===i)return!0;var a=e.settings.planarDirection,n=t.z;return Math.abs(n)<a.localAltitude}function f(t,e){var i,a,n=t.valueOf();e.polarException===o.POLAR_EXCEPTION.MIDNIGHT_SUN?(i=n-60*(t.getHours()+48)*60*1e3-60*t.getMinutes()*1e3,a=i+432e6):e.polarException===o.POLAR_EXCEPTION.POLAR_NIGHT?(i=n-2,a=n-1):(i=e.sunrise.valueOf(),a=e.sunset.valueOf());var l=a-i,s=i+l/2;return 1-r.clamp(Math.abs(n-s)/432e5,0,1)}function m(t,i){var a,n,r=t.valueOf();i.polarException===o.POLAR_EXCEPTION.MIDNIGHT_SUN?(a=r-60*(t.getHours()+48)*60*1e3-60*t.getMinutes()*1e3,n=a+432e6):i.polarException===o.POLAR_EXCEPTION.POLAR_NIGHT?(a=r-2,n=r-1):(a=i.sunrise.valueOf(),n=i.sunset.valueOf());var s,u,c=n-a,f=a+c/2,m=c/4,d=f-m,b=f+m,v=.06*c,A=v,h=a-v/2,p=a+v/2,y=n-A/2,N=n+A/2,O=e.settings.local,P=[.01,O.ambientAtNight],E=[.8,.8,1],I=[.01,.01,.01],M=[O.diffuseAtTwilight,O.ambientAtTwilight],T=[1,.75,.75],z=[.8,.8,1],x=[.9*O.diffuseAtNoon,O.ambientAtNoon],_=[1,.98,.98],D=[.98,.98,1],C=[O.diffuseAtNoon,O.ambientAtNoon],H=[1,1,1],L=[1,1,1],R=x,X=_,w=D,F=M,G=T,S=z,U=[0,0],V=[0,0,0],j=[0,0,0];return r<h||r>N?(U=P,V=I,j=E,u="night"):r<p?(s=p-h,U=g(r-h,s,P,M),V=g(r-h,s,I,T),j=g(r-h,s,E,z),u="sun rising"):r<d?(s=d-p,U=g(r-p,s,M,x),V=g(r-p,s,T,_),j=g(r-p,s,z,D),u="early morning"):r<f?(s=f-d,U=g(r-d,s,x,C),V=g(r-d,s,_,H),j=g(r-d,s,D,L),u="late morning"):r<b?(s=b-f,U=g(r-f,s,C,R),V=g(r-f,s,H,X),j=g(r-f,s,L,w),u="early afternoon"):r<y?(s=y-b,U=g(r-b,s,R,F),V=g(r-b,s,X,G),j=g(r-b,s,w,S),u="late afternoon"):r<N&&(s=N-y,U=g(r-y,s,F,P),V=g(r-y,s,G,I),j=g(r-y,s,S,E),u="sun setting"),{diffuse:{intensity:U[0],color:l.vec3f64.fromValues(V[0],V[1],V[2])},ambient:{intensity:U[1],color:l.vec3f64.fromValues(j[0],j[1],j[2])},timeOfDay:u}}function g(t,e,i,a){for(var n=[],l=0;l<i.length;l++)n[l]=(a[l]-i[l])*t/e+i[l];return n}Object.defineProperty(e,"__esModule",{value:!0}),e.settings={local:{altitude:1500,ambientAtNight:.1,ambientAtNoon:.45,ambientAtTwilight:.2,diffuseAtNoon:.65,diffuseAtTwilight:.7},global:{altitude:8e5,ambient:.015,diffuse:.75},planarDirection:{localAltitude:1e4,globalAltitude:1e6,globalAngles:{azimuth:1.3*Math.PI,altitude:.6*Math.PI}}},e.computeColorAndIntensity=s,e.computeDirection=u,e.computeShadowsEnabled=c;var d=a.mat4f64.create(),b={azimuth:0,altitude:0},v={ambient:{color:l.vec3f64.create(),intensity:0},diffuse:{color:l.vec3f64.create(),intensity:0,direction:l.vec3f64.create()},globalFactor:0,noonFactor:0}});
