@@ -11,6 +11,6 @@
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true
   },
-  "include": ["./widgets/Print.tsx"],
+  "include": ["./widgets/Draw.tsx"],
   "exclude": ["node_modules"]
 }

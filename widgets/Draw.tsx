@@ -153,9 +153,11 @@ import SceneView = require("esri/views/SceneView");
 
 // esri.widgets
 import Widget = require("esri/widgets/Widget");
-
+import ColorPicker = require("esri/widgets/ColorPicker");
 // esri.widgets.Sketch
 import SketchViewModel = require("esri/widgets/Sketch/SketchViewModel");
+
+import Color = require("esri/Color");
 
 // esri.widgets.Sketch.support
 import {
@@ -173,6 +175,7 @@ import {
 // esri.widgets.support
 import { VNode } from "esri/widgets/support/interfaces";
 import { renderable, tsx, vmEvent } from "esri/widgets/support/widget";
+import { VNode } from "maquette";
 
 const CSS = {
   // sketch classes
@@ -191,6 +194,7 @@ const CSS = {
   // button classes
   button: "esri-sketch__button",
   selectedButton: "esri-sketch__button--selected",
+  esriButton: "esri-button esri-button--secondary",
 
   // icon classes
   pointIcon: "esri-icon-map-pin",
@@ -208,7 +212,12 @@ const CSS = {
   // common
   esriWidget: "esri-widget",
   widgetIcon: "esri-icon-edit",
-  disabled: "esri-disabled"
+  disabled: "esri-disabled",
+
+  // color picker classes
+  colorVisible: "color-picker-visible",  
+  colorNotVisible: "color-picker-not-visible",
+
 };
 
 type Layout = "vertical" | "horizontal";
@@ -989,7 +998,83 @@ class Sketch extends declared(Widget) {
     this.view.focus();
   }
 
+  private _rendered:boolean = false;
+  private _outlinepicker:ColorPicker;
+  private _fillpicker:ColorPicker;
+  private _fillColor:Color = new Color("rgba(255,0,0,0.5)");
+  private _outlineColor:Color = new Color("rgba(255,255,255,1)");;
   render(): VNode {
+    if (this._rendered) {
+      if (!this._fillpicker) {
+        let rgba:string = null;
+
+        if (this._fillColor) {
+          document.getElementById('fill-button').style.backgroundColor = "rgba(" + this._fillColor.toRgba().toString() + ")";
+        } else {
+          document.getElementById('fill-button').style.backgroundColor = "rgba(255,255,255,0)";
+        }
+          this._fillpicker = new ColorPicker({container:"fillColor", color: this._fillColor});
+          this._fillpicker.watch('color', color => {
+            if (color) {
+              rgba = 'rgba('+color.r+','+color.g+','+color.b+','+color.a+')';
+              this._fillColor = new Color(rgba);
+            } else {
+              this._fillColor.a = 0;
+            }
+            
+            document.getElementById('fill-button').style.backgroundColor = rgba;
+            if (this.updateGraphics.length) {
+              this.updateGraphics.forEach((graphic:Graphic) => {
+                if (graphic.geometry.type === 'point') {
+                  this._changePointSymbol(graphic);
+                }
+                if (graphic.geometry.type === 'polygon') {
+                  this._changeFillSymbol(graphic);
+                }
+                if (graphic.geometry.type === 'polyline') {
+                  this._changeLineSymbol(graphic);
+                }                                
+              });
+            }
+          });
+      }     
+      if (!this._outlinepicker) {
+        let rgba:string = null;
+
+
+        if (this._outlineColor) {
+          document.getElementById('outline-button').style.backgroundColor = "rgba(" + this._outlineColor.toRgba().toString() + ")";
+        } else {
+          document.getElementById('outline-button').style.backgroundColor = "rgba(255,255,255,0)";
+        }
+        this._outlinepicker = new ColorPicker({container:"outlineColor", color: this._outlineColor});
+
+
+        this._outlinepicker.watch('color', color => {
+
+          if (color) {
+            rgba = 'rgba('+color.r+','+color.g+','+color.b+','+color.a+')';
+            this._outlineColor = new Color(rgba);
+          } else {
+            this._outlineColor.a = 0;
+          }          
+          document.getElementById('outline-button').style.backgroundColor = rgba;
+          if (this.updateGraphics.length) {
+            this.updateGraphics.forEach((graphic:Graphic) => {
+              if (graphic.geometry.type === 'point') {
+                this._changePointSymbol(graphic);
+              }
+              if (graphic.geometry.type === 'polygon') {
+                this._changeFillSymbol(graphic);
+              }
+              if (graphic.geometry.type === 'polyline') {
+                this._changeLineSymbol(graphic);
+              }                                
+            });          
+        }});
+      }
+    }
+    this._rendered = true;    
     const { state } = this.viewModel;
     const classes = this.classes(
       CSS.base,
@@ -1002,6 +1087,9 @@ class Sketch extends declared(Widget) {
       <div aria-label={i18n.widgetLabel} class={classes}>
         <div class={CSS.panel}>{this.renderTopPanelContents()}</div>
         <div class={this.classes(CSS.panel, CSS.infoPanel)}>{this.renderInfoPanelContents()}</div>
+        <div class={this.classes(CSS.section)}>{this.renderFillButton()}</div>
+        <div class={this.classes(CSS.section)}>{this.renderOutlineButton()}</div>
+
       </div>
     );
   }
@@ -1013,6 +1101,7 @@ class Sketch extends declared(Widget) {
       </div>,
       <div class={this.classes(CSS.section, CSS.toolSection)}>{this.renderDrawButtons()}</div>,
       <div class={this.classes(CSS.section, CSS.toolSection)}>{this.renderMenuButtons()}</div>
+
     ];
   }
 
@@ -1046,6 +1135,7 @@ class Sketch extends declared(Widget) {
       </div>
     );
   }
+
 
   protected renderDeleteButton(): VNode {
     const title = i18n.deleteFeature;
@@ -1248,6 +1338,84 @@ class Sketch extends declared(Widget) {
     );
   }
 
+  private _fillSelected = false;
+
+  private _showFillColor() {
+    this._fillSelected = !this._fillSelected;
+    if (this._outlineSelected) {
+      this._outlineSelected = false;
+    }
+  }
+  
+  private _outlineSelected = false;
+  private _showOutlineColor() {
+    this._outlineSelected = !this._outlineSelected;
+    if (this._fillSelected) {
+      this._fillSelected = false;
+    }
+
+  }
+    
+
+  protected renderFillButton(): VNode {
+    let classes = [];
+    if (this._fillSelected) {
+        classes.push(CSS.colorVisible)
+    } else {
+        classes.push(CSS.colorNotVisible);
+    }
+    return (
+      <div>
+      <button
+      // disabled={isDisabled}
+       id="fill-button"
+       key="fill-button"
+       class={this.classes(CSS.esriButton)}//, isDisabled && CSS.buttonDisabled)}
+       bind={this}
+       onclick={this._showFillColor}
+       title="Fill Color"
+       aria-label="Fill Color"
+     >
+       Fill Color
+     </button>    
+     <div id="fill-section" key="fill-section" class={this.classes(classes)}> 
+      <div id="fillColor" key="fillColor" 
+      bind={this}
+      ></div>
+      </div>
+      </div>);
+  }
+
+  protected renderOutlineButton(): VNode {
+    let classes = [];
+    if (this._outlineSelected) {
+        classes.push(CSS.colorVisible)
+    } else {
+        classes.push(CSS.colorNotVisible);
+    }
+    return (
+      <div>
+      <button
+      // disabled={isDisabled}
+       id="outline-button"
+       key="outline-button"
+       class={this.classes(CSS.esriButton)}//, isDisabled && CSS.buttonDisabled)}
+       bind={this}
+       onclick={this._showOutlineColor}
+       title="Outline Color"
+       aria-label="Outline Color"
+     >
+       Outline Color
+     </button>    
+     <div id="outline-section" key="outline-section" class={this.classes(classes)}> 
+      <div id="outlineColor" key="outlineColor" 
+      bind={this}
+      ></div>
+      </div>
+      </div>);
+  }  
+
+
   //--------------------------------------------------------------------------
   //
   //  Private Methods
@@ -1274,11 +1442,62 @@ class Sketch extends declared(Widget) {
     }
   }
 
+  private _changePointSymbol(graphic:Graphic) {
+    graphic.symbol = {
+      type: "simple-marker",  // autocasts as new SimpleFillSymbol()
+      color: new Color(this._fillColor),
+      style: "circle",
+      size: 10,
+      outline: {  // autocasts as new SimpleLineSymbol()
+        color: new Color(this._outlineColor),
+       // width: this.width
+      }
+    };
+  }
+
+  private _changeFillSymbol(graphic:Graphic) {
+    graphic.symbol = {
+      type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+      color: new Color(this._fillColor),
+      style: "solid",
+      outline: {  // autocasts as new SimpleLineSymbol()
+        color: new Color(this._outlineColor),
+        width: 2
+      }
+    };
+  }
+  private _changeLineSymbol(graphic:Graphic) {
+    graphic.symbol = {
+      type: "simple-line",  // autocasts as new SimpleFillSymbol()
+      color: new Color(this._outlineColor),
+      style: "solid",
+      width: 2
+    };
+  }
+
+
+
+ 
+
   private _onOperationComplete(event: CreateEvent | UpdateEvent): void {
     // Reset the default tool when an operation finishes
     if (event.state === "complete" || event.state === "cancel") {
       this._modifyDefaultUpdateTool("transform");
     }
+      if (event.state === "complete"){
+      if (event.graphic.geometry.type === 'point') {
+        this._changePointSymbol(event.graphic);
+      }      
+    
+
+      if (event.graphic.geometry.type === 'polygon') {
+        this._changeFillSymbol(event.graphic);
+      } else if (event.graphic.geometry.type === 'polyline') {
+        this._changeLineSymbol(event.graphic);
+
+      }
+    }
+    
   }
 
   // Resets the default update tool
